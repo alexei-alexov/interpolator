@@ -1,7 +1,9 @@
 package main;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
@@ -18,11 +20,11 @@ public class Interpolator {
     public static final int I_LAGRANGE = 2;
     public static final int I_SPLINE = 3;
 
-    public static ArrayList<DataRow> interpolate(int type, ObservableList<DataRow> data) {
+    public static ObservableList<XYChart.Data> interpolate(int type, ObservableList<DataRow> data) {
 
         switch(type) {
             case I_LINEAR:
-                return linearIntepolation(data);
+                return linearInterpolation(data);
             case I_NEWTON:
             case I_LAGRANGE:
             case I_SPLINE:
@@ -33,10 +35,10 @@ public class Interpolator {
 
     }
 
-    private static ArrayList<DataRow> linearIntepolation(ObservableList<DataRow> data) {
-        ArrayList<DataRow> result = new ArrayList<>();
-
-
+    private static ObservableList<XYChart.Data> linearInterpolation(ObservableList<DataRow> data) {
+        ObservableList<XYChart.Data> result = FXCollections.observableArrayList();
+        for(DataRow item : data)
+            result.add(new XYChart.Data(item.getX(), item.getY()));
 
         return result;
     }
