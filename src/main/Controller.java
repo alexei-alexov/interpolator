@@ -62,12 +62,20 @@ public class Controller {
 
     @FXML
     private void interpolateNewton() {
-
+        if (data.size() > 1)
+            showGraph(Interpolator.I_NEWTON);
     }
 
     @FXML
     private void interpolateLagrange() {
+        if (data.size() > 1)
+            showGraph(Interpolator.I_LAGRANGE);
+    }
 
+    @FXML
+    private void interpolateSpline() {
+        if (data.size() > 1)
+            showGraph(Interpolator.I_SPLINE);
     }
 
     @FXML

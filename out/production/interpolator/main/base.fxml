@@ -16,7 +16,7 @@
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateLinear" text="Лінійна інтерполяція" VBox.vgrow="ALWAYS" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateNewton" text="Інтерполяція - поліном Ньютона" VBox.vgrow="ALWAYS" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateLagrange" text="Інтерполяція - поліном Лагранжа" VBox.vgrow="ALWAYS" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Інтерполяція - кубічні сплайни" VBox.vgrow="ALWAYS" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateSpline" text="Інтерполяція - кубічні сплайни" VBox.vgrow="ALWAYS" />
             <VBox spacing="5.0">
                <children>
                   <Label layoutX="220.0" layoutY="269.0" text="Функція (для перевірки)" />
