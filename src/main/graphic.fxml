@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.canvas.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.Graphic">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" text="Підпис" AnchorPane.topAnchor="10.0" />
+      <LineChart layoutX="14.0" layoutY="31.0" prefHeight="278.0" prefWidth="559.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0">
+        <xAxis>
+          <NumberAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Button alignment="CENTER" layoutX="166.0" layoutY="313.0" mnemonicParsing="false" text="Закрити" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <HBox.margin>
+            <Insets left="10.0" />
+         </HBox.margin>
+      </Button>
+      <CheckBox layoutX="10.0" layoutY="313.0" mnemonicParsing="false" text="Функція для перевірки" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" />
+   </children>
+</AnchorPane>
