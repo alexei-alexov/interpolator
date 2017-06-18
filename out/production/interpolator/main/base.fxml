@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="450.0" minWidth="450.0" prefHeight="450.0" prefWidth="452.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.Controller">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="450.0" minWidth="450.0" prefHeight="450.0" prefWidth="511.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.Controller">
    <children>
-      <VBox layoutX="176.0" layoutY="23.0" prefWidth="215.0" spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <VBox layoutX="176.0" layoutY="23.0" maxHeight="1.7976931348623157E308" prefWidth="215.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateLinear" text="Лінійна інтерполяція" VBox.vgrow="ALWAYS" />
             <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#interpolateNewton" text="Інтерполяція - поліном Ньютона" VBox.vgrow="ALWAYS" />
@@ -28,6 +28,14 @@
                   </HBox>
                </children>
             </VBox>
+            <Label text="Конкретне значення" />
+            <HBox spacing="10.0">
+               <children>
+                  <TextField maxWidth="1.7976931348623157E308" promptText="Х" HBox.hgrow="ALWAYS" fx:id="xCalculateField" />
+                  <Button mnemonicParsing="false" onAction="#calculateX" text="Знайти" />
+               </children>
+            </HBox>
+            <TextArea fx:id="textFlow" editable="false" prefHeight="98.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
       <VBox layoutX="-39.0" layoutY="-27.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="10.0">
@@ -52,8 +60,8 @@
             </VBox>
             <TableView fx:id="table" editable="true" minWidth="-Infinity" prefHeight="322.0" prefWidth="151.0" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn prefWidth="93.0" text="X" fx:id="xColumn" />
-                <TableColumn fx:id="yColumn" minWidth="-1.0" prefWidth="96.0" text="Y" />
+                <TableColumn prefWidth="125.0" text="X" fx:id="xColumn" />
+                <TableColumn fx:id="yColumn" minWidth="-1.0" prefWidth="125.0" text="Y" />
               </columns>
             </TableView>
          </children>

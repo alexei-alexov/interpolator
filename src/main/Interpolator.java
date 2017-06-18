@@ -23,73 +23,103 @@ public class Interpolator {
     public static final int I_LAGRANGE = 2;
     public static final int I_SPLINE = 3;
 
-    public static ObservableList<XYChart.Data> interpolate(int type, ObservableList<DataRow> data) {
+    private static List<Double> dataX = new ArrayList<>();
+    private static List<Double> dataY = new ArrayList<>();
 
-        switch(type) {
-            case I_LINEAR:
-                return linearInterpolation(data);
-            case I_NEWTON:
-                return newtonInterpolation(data);
-            case I_LAGRANGE:
-                return lagrangeInterpolation(data);
-            case I_SPLINE:
-                return splineInterpolation(data);
-            default: return null;
+    private static double[] dataArrayX;
+    private static double[] dataArrayY;
+    private static double[] dataArrayA;
+    private static double[] dataArrayC;
+    private static double perscise;
+
+    private static final String[] NAMES = {
+            "Лінійна інтерполяція",
+            "Інтерполяція Ньютона",
+            "Інтерполяція Лагранжа",
+            "Сплайнова інтерполяція"
+    };
+
+    private static boolean dataChanged = true;
+
+    public static void notifyChange(){
+        dataChanged = true;
+    }
+
+    private static void recalculateData() {
+        ObservableList<DataRow> data = Controller.instance.getData();
+        dataArrayX = new double[data.size()];
+        dataArrayY = new double[data.size()];
+        DataRow item;
+        for(int i = 0; i < data.size(); i++) {
+            item = data.get(i);
+            dataX.add(item.getX());
+            dataY.add(item.getY());
+            dataArrayX[i] = item.getX();
+            dataArrayY[i] = item.getY();
+
         }
 
+        dataArrayC = new double[dataArrayX.length-1];
+        System.arraycopy(dataArrayX, 0, dataArrayC, 0, dataArrayC.length);
+
+        dataArrayA = computeDividedDifference(dataArrayX, dataArrayY);
+
+        double start = dataArrayX[0], end = dataArrayX[dataArrayX.length - 1];
+        perscise = (end - start) / POINTS; perscise = Math.round(perscise * 1000000.0) / 1000000.0;
 
     }
 
-    private static ObservableList<XYChart.Data> linearInterpolation(ObservableList<DataRow> data) {
+    private static void checkData() {
+        if (dataChanged){
+            recalculateData();
+            dataChanged = false;
+        }
+    }
+
+    public static ObservableList<XYChart.Data> interpolate(int type) {
+        checkData();
+        switch(type) {
+            case I_LINEAR:
+                return linearInterpolation();
+            case I_NEWTON:
+                return newtonInterpolation();
+            case I_LAGRANGE:
+                return lagrangeInterpolation();
+            case I_SPLINE:
+                return splineInterpolation();
+            default: return null;
+        }
+    }
+
+    private static ObservableList<XYChart.Data> linearInterpolation() {
+
         ObservableList<XYChart.Data> result = FXCollections.observableArrayList();
-        for(DataRow item : data)
+        for(DataRow item : Controller.instance.getData())
             result.add(new XYChart.Data(item.getX(), item.getY()));
 
         return result;
     }
 
-    private static ObservableList<XYChart.Data> splineInterpolation(ObservableList<DataRow> data) {
+    private static ObservableList<XYChart.Data> splineInterpolation() {
         ObservableList<XYChart.Data> result = FXCollections.observableArrayList();
-        List<Double> xs = new ArrayList<Double>(), ys = new ArrayList<Double>();
-        for(DataRow item : data) {
-            xs.add(item.getX());
-            ys.add(item.getY());
-        }
+
         // calculate diffs
-        SplineInterpolator interpolator = SplineInterpolator.createMonotoneCubicSpline(xs, ys);
-        double start = data.get(0).getX(), end = data.get(data.size() - 1).getX();
-        double perscise = (end - start) / POINTS; perscise = Math.round(perscise * 1000000.0) / 1000000.0;
+        SplineInterpolator interpolator = SplineInterpolator.createMonotoneCubicSpline(dataX, dataY);
+        double start = dataX.get(0), end = dataX.get(dataX.size() - 1);
         end += perscise;
         for(; start <= end; start += perscise)
             result.add(new XYChart.Data(start, interpolator.interpolate(start)));
         return result;
     }
 
-    private static String lastFormula = null;
-
-    public static String getLastFormula() {
-        return lastFormula;
-    }
-
-    private static ObservableList<XYChart.Data> newtonInterpolation(ObservableList<DataRow> data) {
+    private static ObservableList<XYChart.Data> newtonInterpolation() {
         ObservableList<XYChart.Data> result = FXCollections.observableArrayList();
 
-        double[] x = new double[data.size()], y = new double[data.size()];
-        DataRow row;
-        for(int i = 0; i < data.size(); i++) {
-            row = data.get(i);
-            x[i] = row.getX();
-            y[i] = row.getY();
-        }
-        PolynomialFunctionLagrangeForm.verifyInterpolationArray(x, y, false);
-        final double[] c = new double[x.length-1];
-        System.arraycopy(x, 0, c, 0, c.length);
+        PolynomialFunctionLagrangeForm.verifyInterpolationArray(dataArrayX, dataArrayY, false);
 
-        final double[] a = computeDividedDifference(x, y);
-        PolynomialFunctionNewtonForm form = new PolynomialFunctionNewtonForm(a, c);
+        PolynomialFunctionNewtonForm form = new PolynomialFunctionNewtonForm(dataArrayA, dataArrayC);
 
-        double start = data.get(0).getX(), end = data.get(data.size() - 1).getX();
-        double perscise = (end - start) / POINTS; perscise = Math.round(perscise * 1000000.0) / 1000000.0;
+        double start = dataArrayX[0], end = dataArrayX[dataArrayX.length - 1];
         end += perscise;
         for(; start <= end; start += perscise)
             result.add(new XYChart.Data(start, form.value(start)));
@@ -119,25 +149,67 @@ public class Interpolator {
         return a;
     }
 
-    private static ObservableList<XYChart.Data> lagrangeInterpolation(ObservableList<DataRow> data) {
+    private static ObservableList<XYChart.Data> lagrangeInterpolation() {
         ObservableList<XYChart.Data> result = FXCollections.observableArrayList();
 
-        double[] x = new double[data.size()], y = new double[data.size()];
-        DataRow row;
-        for(int i = 0; i < data.size(); i++) {
-            row = data.get(i);
-            x[i] = row.getX();
-            y[i] = row.getY();
-        }
-        PolynomialFunctionLagrangeForm.verifyInterpolationArray(x, y, false);
+        PolynomialFunctionLagrangeForm.verifyInterpolationArray(dataArrayX, dataArrayY, false);
 
-        PolynomialFunctionLagrangeForm form = new PolynomialFunctionLagrangeForm(x, y);
+        PolynomialFunctionLagrangeForm form = new PolynomialFunctionLagrangeForm(dataArrayX, dataArrayY);
 
-        double start = data.get(0).getX(), end = data.get(data.size() - 1).getX();
-        double perscise = (end - start) / POINTS; perscise = Math.round(perscise * 1000000.0) / 1000000.0;
+        double start = dataArrayX[0], end = dataArrayX[dataArrayX.length - 1];
         end += perscise;
         for(; start <= end; start += perscise)
             result.add(new XYChart.Data(start, form.value(start)));
         return result;
     }
+
+    public static String getNameByType(int type) {
+        return NAMES[type];
+    }
+
+    /**
+     * Find all interpolations of Y in given X.
+     *
+     * @param x - argument to find y from
+     * @return string result of all interpolations
+     */
+    public static String getAddByX(double x) {
+        checkData();
+        final String pattern = "%s: %f\n";
+        StringBuilder result = new StringBuilder("РЕЗУЛЬТАТИ:\n");
+        // linear
+        double x0 = -1, y0 = 0, x1 = 0, y1 = 0;
+        int i = -1;
+        for (i = 0; i < dataArrayX.length - 1; i++) {
+            if (x > dataArrayX[i]){
+                x0 = dataArrayX[i];
+                x1 = dataArrayX[i + 1];
+                y0 = dataArrayY[i];
+                y1 = dataArrayY[i + 1];
+                break;
+            }
+        }
+        if ((dataArrayX.length - 1) == i)
+            return "Помилка даних";
+
+        double a = (y1 - y0) / (x1 - x0);
+        double b = y0 - x0 * a;
+        double linearResult = Math.round((x * a + b) * 1000000.0) / 1000000.0;
+        result.append(String.format(pattern, getNameByType(I_LINEAR), linearResult));
+
+        // Newton
+        PolynomialFunctionNewtonForm formNewton = new PolynomialFunctionNewtonForm(dataArrayA, dataArrayC);
+        result.append(String.format(pattern, getNameByType(I_NEWTON), formNewton.value(x)));
+        // Lagrange
+        PolynomialFunctionLagrangeForm formLagrange = new PolynomialFunctionLagrangeForm(dataArrayX, dataArrayY);
+        result.append(String.format(pattern, getNameByType(I_LAGRANGE), formLagrange.value(x)));
+        // SPLINE
+        SplineInterpolator interpolator = SplineInterpolator.createMonotoneCubicSpline(dataX, dataY);
+        result.append(String.format(pattern, getNameByType(I_SPLINE), interpolator.interpolate(x)));
+
+
+        return result.toString();
+
+    }
+
 }
